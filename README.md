@@ -1,39 +1,91 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+# Fully Featured Authentication system
 
-Welcome,
+- Install django
 
-This is the Code Institute student template for Codeanywhere. If you are using Gitpod then you need [this template](https://github.com/Code-Institute-Org/gitpod-full-template) instead.  We have preinstalled all of the tools you need to get started. It's perfectly ok to use this template as the basis for your project submissions.
+    `pip install django`
 
-You can safely delete this README.md file, or change it for your own project. Please do read it at least once, though! It contains some important information about Codeanywhere and the extensions we use. Some of this information has been updated since the video content was created. The last update to this file was: **July 26th, 2023**
+- Install django-allauth
 
-## Codeanywhere Reminders
+    `pip install django-allauth`
 
-To run a frontend (HTML, CSS, Javascript only) application in Codeanywhere, in the terminal, type:
 
-`python3 -m http.server`
+- Create a django project
 
-A button should appear to click: _Open Preview_ or _Open Browser_.
+    `django-admin startproject authentication .`
 
-To run a frontend (HTML, CSS, Javascript only) application in Codeanywhere with no-cache, you can use this alias for `python3 -m http.server`.
+- Add the following to settings.py
 
-`http_server`
+    ```Python
+    AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
 
-To run a backend Python file, type `python3 app.py`, if your Python file is named `app.py` of course.
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
 
-A button should appear to click: _Open Preview_ or _Open Browser_.
+    ]
+    ```
 
-In Codeanywhere you have superuser security privileges by default. Therefore you do not need to use the `sudo` (superuser do) command in the bash terminal in any of the lessons.
+    ```Python
+    INSTALLED_APPS = [
+    ...
+    # The following apps are required:
+    'django.contrib.auth',
+    'django.contrib.messages',
 
-To log into the Heroku toolbelt CLI:
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # ...and include the providers you want to enable:
+    ```
 
-1. Log in to your Heroku account and go to _Account Settings_ in the menu under your avatar.
-2. Scroll down to the _API Key_ and click _Reveal_
-3. Copy the key
-4. In Codeanywhere, from the terminal, run `heroku_config`
-5. Paste in your API key when asked
+- Add the path to urls.py
 
-You can now use the `heroku` CLI program - try running `heroku apps` to confirm it works. This API key is unique and private to you so do not share it. If you accidentally make it public then you can create a new one with _Regenerate API Key_.
+    ```Python
+    from django.urls import path, include
 
----
+    urlpatterns = [
+    path('accounts/', include('allauth.urls')),
+    ]
+    ```
 
-Happy coding!
+- Create the database tables
+
+    `python3 manage.py migrate --plan`
+    
+    - then if everything ok:
+    
+    `python3 manage.py migrate`
+
+- Create a superuser
+
+    `python3 manage.py createsuperuser`
+
+- Run the project
+
+    `python3 manage.py runserver`
+
+    - it might show an error *_DisallowedHost at /_*, then add the following
+
+    `ALLOWED_HOSTS = ['8000-yannickferenczi-fully-fe-iapagkgdhs.us2.codeanyapp.com']`
+
+    - if you get an error Forbidden, csrf verification failed, add the following
+
+    `CSRF_TRUSTED_ORIGINS = ['https://8000-yannickferenczi-fully-fe-iapagkgdhs.us2.codeanyapp.com']`
+
+- To personalize the authentication, add some configuration to settings.py
+
+    ```Python
+    ACCOUNT_EMAIL_REQUIRED = True
+    ACCOUNT_AUTHENTICATION_METHOD = 'email'
+    ACCOUNT_CHANGE_EMAIL = True
+    ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+    ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+    ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Subject-Prefixe'
+
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'  # See more details
+
+    ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+    ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
+    ACCOUNT_USERNAME_REQUIRED = False
+    ```
